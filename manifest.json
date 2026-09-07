@@ -1,0 +1,9 @@
+{
+  "name": "Islamic Memory Match",
+  "short_name": "Memory Islamic",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#a8e6cf",
+  "theme_color": "#4CAF50",
+  "orientation": "portrait"
+}
