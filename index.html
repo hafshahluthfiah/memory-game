@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Islamic Memory Match</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4CAF50">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+      background: linear-gradient(135deg, #a8e6cf, #dbede3);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      overflow: hidden;
+    }
+    header {
+      text-align: center;
+      width: 100%;
+    }
+    h1 { color: #2e7d32; font-size: 1.8rem; text-shadow: 1px 1px 2px white; }
+    .scoreboard {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      max-width: 500px;
+      margin-top: 5px;
+    }
+    .player-card {
+      background: white;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      border: 3px solid transparent;
+      transition: all 0.3s;
+    }
+    .player-card.active {
+      border-color: #ff9800;
+      transform: scale(1.05);
+      background: #fff8e1;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 500px;
+      height: 60vh;
+      perspective: 1000px;
+    }
+    .card {
+      background-color: transparent;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      border-radius: 12px;
+    }
+    .card.flipped .card-inner { transform: rotateY(180deg); }
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-front {
+      background: #4caf50;
+      color: white;
+      font-size: 2.5rem;
+      border: 4px solid #fff;
+    }
+    .card-back {
+      background: #ffffff;
+      transform: rotateY(180deg);
+      border: 4px solid #ffb74d;
+    }
+    .card-back .icon { font-size: 2.5rem; }
+    .card-back .label { font-size: 0.8rem; font-weight: bold; color: #333; margin-top: 4px; }
+    
+    footer {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 5px;
+    }
+    button {
+      background: #ff9800;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #e65100;
+    }
+    button:active { transform: translateY(2px); box-shadow: 0 2px 0 #e65100; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🕌 Memory Match Islamic</h1>
+    <div class="scoreboard">
+      <div id="p1-display" class="player-card active">Pemain 1: <span id="p1-score">0</span></div>
+      <div id="p2-display" class="player-card">Pemain 2: <span id="p2-score">0</span></div>
+    </div>
+  </header>
+
+  <div class="grid" id="grid"></div>
+
+  <footer>
+    <button onclick="resetGame()">🔄 Main Lagi</button>
+    <button id="fullscreen-btn" onclick="toggleFullScreen()">📺 Fullscreen</button>
+  </footer>
+
+  <script>
+    const items = [
+      { icon: '🕌', label: 'Masjid' },
+      { icon: '📖', label: 'Al-Qur\'an' },
+      { icon: '🌙', label: 'Hilal' },
+      { icon: '📿', label: 'Tasbih' },
+      { icon: '🕋', label: 'Ka\'bah' },
+      { icon: 'Dates', label: 'Kurma', isText: true, iconEmoji: '🌴' },
+      { icon: '💧', label: 'Wudhu' },
+      { icon: '✨', label: 'Sedekah' }
+    ];
+
+    let cardsData = [];
+    let flippedCards = [];
+    let matchedPairs = 0;
+    let currentPlayer = 1;
+    let scores = { 1: 0, 2: 0 };
+    let canFlip = true;
+
+    // Web Audio API Synth SFX (Tanpa butuh file audio luar)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playSFX(type) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'flip') {
+        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+      } else if (type === 'match') {
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } else if (type === 'wrong') {
+        osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.2);
+      }
+    }
+
+    function initGame() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      flippedCards = [];
+      matchedPairs = 0;
+      currentPlayer = 1;
+      scores = { 1: 0, 2: 0 };
+      updateScoreboard();
+
+      // Duplikasi kartu & acak
+      const deck = [...items, ...items]
+        .map((item, index) => ({ ...item, id: index }))
+        .sort(() => Math.random() - 0.5);
+
+      deck.forEach((data) => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.dataset.label = data.label;
+
+        card.innerHTML = `
+          <div class="card-inner">
+            <div class="card-front">🌙</div>
+            <div class="card-back">
+              <div class="icon">${data.iconEmoji || data.icon}</div>
+              <div class="label">${data.label}</div>
+            </div>
+          </div>
+        `;
+        card.addEventListener('click', () => flipCard(card));
+        grid.appendChild(card);
+      });
+    }
+
+    function flipCard(card) {
+      if (!canFlip || card.classList.contains('flipped') || flippedCards.includes(card)) return;
+
+      playSFX('flip');
+      card.classList.add('flipped');
+      flippedCards.push(card);
+
+      if (flippedCards.length === 2) {
+        checkMatch();
+      }
+    }
+
+    function checkMatch() {
+      canFlip = false;
+      const [card1, card2] = flippedCards;
+
+      if (card1.dataset.label === card2.dataset.label) {
+        playSFX('match');
+        scores[currentPlayer]++;
+        matchedPairs++;
+        flippedCards = [];
+        canFlip = true;
+        updateScoreboard();
+
+        if (matchedPairs === items.length) {
+          setTimeout(() => {
+            alert(`Hore! Permainan Selesai!\n\nPemain 1: ${scores[1]} Poin\nPemain 2: ${scores[2]} Poin`);
+          }, 500);
+        }
+      } else {
+        playSFX('wrong');
+        setTimeout(() => {
+          card1.classList.remove('flipped');
+          card2.classList.remove('flipped');
+          flippedCards = [];
+          currentPlayer = currentPlayer === 1 ? 2 : 1;
+          updateScoreboard();
+          canFlip = true;
+        }, 1000);
+      }
+    }
+
+    function updateScoreboard() {
+      document.getElementById('p1-score').innerText = scores[1];
+      document.getElementById('p2-score').innerText = scores[2];
+      
+      document.getElementById('p1-display').classList.toggle('active', currentPlayer === 1);
+      document.getElementById('p2-display').classList.toggle('active', currentPlayer === 2);
+    }
+
+    function resetGame() {
+      initGame();
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Register Service Worker untuk PWA Offline
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+
+    window.onload = initGame;
+  </script>
+</body>
+</html>
