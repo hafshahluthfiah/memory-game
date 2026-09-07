@@ -9,19 +9,23 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
     body {
       font-family: 'Comic Sans MS', 'Chalkboard SE', 'Fredoka', sans-serif;
-      background: linear-gradient(135deg, #E8DFF5, #FCE1E4, #E1F0DA, #DD2F9);
+      background: linear-gradient(135deg, #E8DFF5, #FCE1E4, #E1F0DA, #E8DFF5);
       background-size: 300% 300%;
       animation: gradientBG 18s ease infinite;
-      height: 100vh;
-      width: 100vw;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 20px;
-      overflow: hidden;
+      padding: 10px 16px;
     }
 
     @keyframes gradientBG {
@@ -34,7 +38,7 @@
     .modal {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(80, 70, 90, 0.3);
+      background: rgba(80, 70, 90, 0.35);
       backdrop-filter: blur(6px);
       display: flex;
       justify-content: center;
@@ -45,11 +49,11 @@
     .modal-content {
       background: #FFFFFF;
       border-radius: 24px;
-      padding: 24px 32px;
+      padding: 20px 28px;
       width: 90%;
-      max-width: 440px;
+      max-width: 420px;
       text-align: center;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.12);
       border: 4px solid #D4A5A5;
       animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
@@ -59,92 +63,89 @@
       to { transform: scale(1); opacity: 1; }
     }
 
-    .modal h2 {
-      color: #8E7AB5;
-      font-size: 1.8rem;
-      margin-bottom: 12px;
-    }
+    .modal h2 { color: #8E7AB5; font-size: 1.6rem; margin-bottom: 10px; }
 
     .modal input {
       width: 100%;
-      padding: 12px 16px;
-      font-size: 1.1rem;
+      padding: 10px 14px;
+      font-size: 1rem;
       border: 3px solid #B5C99A;
-      border-radius: 14px;
+      border-radius: 12px;
       outline: none;
       text-align: center;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       font-weight: bold;
       color: #4A6B5D;
       background: #F9FBF7;
     }
 
-    .modal input:focus {
-      border-color: #8E7AB5;
-    }
-
     /* Header Controls */
     header {
       width: 100%;
-      max-width: 900px;
+      max-width: 850px;
+      height: 42px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-shrink: 0;
     }
 
     .title-box {
       background: #FFFFFF;
-      padding: 6px 20px;
-      border-radius: 20px;
-      border: 3px solid #C5A880;
+      padding: 4px 16px;
+      border-radius: 18px;
+      border: 2px solid #C5A880;
       color: #7E6352;
       font-weight: bold;
-      font-size: 1.15rem;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      font-size: 1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
 
     .stats-bar {
       display: flex;
-      gap: 16px;
+      gap: 12px;
       background: #FFFFFF;
-      padding: 6px 18px;
-      border-radius: 20px;
-      border: 3px solid #B5C99A;
+      padding: 4px 14px;
+      border-radius: 18px;
+      border: 2px solid #B5C99A;
       font-weight: bold;
-      font-size: 1rem;
+      font-size: 0.9rem;
       color: #4A6B5D;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
 
-    /* Grid Layout Optimized for Landscape: 5 cols x 4 rows */
+    /* Grid Area Fixed Bounds (Landscape Optimized) */
     .grid-container {
       width: 100%;
-      max-width: 900px;
+      max-width: 850px;
       flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 8px 0;
+      padding: 6px 0;
+      min-height: 0; /* Prevents overflow in flexbox */
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       grid-template-rows: repeat(4, 1fr);
-      gap: 12px;
+      gap: 8px;
       width: 100%;
       height: 100%;
-      max-height: 68vh;
+      max-height: calc(100vh - 110px); /* Kunci tinggi area kartu */
       perspective: 1000px;
     }
 
-    /* Square Card Style */
+    /* Card Box Auto Fit */
     .card {
       background-color: transparent;
-      aspect-ratio: 1 / 1;
       cursor: pointer;
       width: 100%;
       height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .card-inner {
@@ -154,8 +155,8 @@
       text-align: center;
       transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
       transform-style: preserve-3d;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-      border-radius: 18px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+      border-radius: 14px;
     }
 
     .card.flipped .card-inner {
@@ -168,87 +169,84 @@
       height: 100%;
       -webkit-backface-visibility: hidden;
       backface-visibility: hidden;
-      border-radius: 18px;
+      border-radius: 14px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
     }
 
-    /* Front Cover Card - Lilac Pastel */
+    /* Front Card (Lilac Pastel) */
     .card-front {
       background: linear-gradient(135deg, #E8DFF5, #D4A5A5);
-      color: white;
-      border: 3px solid #FFFFFF;
+      border: 2px solid #FFFFFF;
     }
 
     .card-front::after {
       content: '🕌';
-      font-size: 2.2rem;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+      font-size: min(4.5vh, 2rem);
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));
     }
 
-    /* Back Card - Sage / Soft Green */
+    /* Back Card (Sage Green) */
     .card-back {
       background: #F4F9F4;
       transform: rotateY(180deg);
-      border: 3px solid #B5C99A;
-      padding: 4px;
+      border: 2px solid #B5C99A;
+      padding: 2px;
     }
 
     .card-back .icon {
-      font-size: 2.3rem;
-      line-height: 1.1;
+      font-size: min(5vh, 2.2rem);
+      line-height: 1;
     }
 
     .card-back .label {
-      font-size: 0.8rem;
+      font-size: min(1.8vh, 0.75rem);
       font-weight: bold;
       color: #4A6B5D;
-      margin-top: 4px;
+      margin-top: 2px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       width: 100%;
     }
 
-    /* Footer Controls */
+    /* Footer Fixed Height */
     footer {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       align-items: center;
+      height: 40px;
+      flex-shrink: 0;
     }
 
     button.btn {
       background: linear-gradient(135deg, #B5C99A, #86A789);
       color: white;
       border: none;
-      padding: 8px 20px;
-      font-size: 0.95rem;
+      padding: 6px 16px;
+      font-size: 0.9rem;
       font-weight: bold;
-      border-radius: 20px;
+      border-radius: 16px;
       cursor: pointer;
-      box-shadow: 0 4px 8px rgba(134, 167, 137, 0.3);
-      transition: all 0.2s;
+      box-shadow: 0 3px 6px rgba(134, 167, 137, 0.25);
     }
 
     button.btn-lilac {
       background: linear-gradient(135deg, #8E7AB5, #B5A1E5);
-      box-shadow: 0 4px 8px rgba(142, 122, 181, 0.3);
+      box-shadow: 0 3px 6px rgba(142, 122, 181, 0.25);
     }
 
-    button.btn:active {
-      transform: translateY(2px);
-      box-shadow: none;
-    }
+    button.btn:active { transform: translateY(2px); }
 
     .icon-btn {
       background: #FFFFFF;
       border: 2px solid #8E7AB5;
       border-radius: 50%;
-      width: 38px;
-      height: 38px;
-      font-size: 1.1rem;
+      width: 34px;
+      height: 34px;
+      font-size: 1rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -259,38 +257,23 @@
     .leaderboard-table {
       width: 100%;
       border-collapse: collapse;
-      margin: 15px 0;
-      font-size: 0.95rem;
+      margin: 10px 0;
+      font-size: 0.85rem;
     }
 
     .leaderboard-table th {
       background-color: #8E7AB5;
       color: white;
-      padding: 8px;
-      border-radius: 8px 8px 0 0;
+      padding: 6px;
     }
 
     .leaderboard-table td {
-      padding: 8px;
+      padding: 6px;
       border-bottom: 1px solid #EFEFEF;
       color: #4A4A4A;
     }
 
-    .leaderboard-table tr:nth-child(even) {
-      background-color: #F8F5FC;
-    }
-
-    .empty-lb {
-      color: #888;
-      font-style: italic;
-      padding: 15px 0;
-    }
-
-    @media (max-height: 500px) {
-      .card-back .icon { font-size: 1.7rem; }
-      .card-back .label { font-size: 0.68rem; }
-      .card-front::after { font-size: 1.6rem; }
-    }
+    .empty-lb { color: #888; font-style: italic; padding: 10px 0; }
   </style>
 </head>
 <body>
@@ -299,7 +282,7 @@
   <div id="name-modal" class="modal">
     <div class="modal-content">
       <h2>✨ Selamat Datang! ✨</h2>
-      <p style="color: #666; margin-bottom: 15px;">Masukkan namamu untuk mulai bermain:</p>
+      <p style="color: #666; margin-bottom: 12px; font-size: 0.9rem;">Masukkan namamu untuk mulai bermain:</p>
       <input type="text" id="player-name-input" placeholder="Nama Pemain..." maxlength="12">
       <button class="btn btn-lilac" onclick="startGameWithPlayer()">Mulai Bermain! 🚀</button>
     </div>
@@ -309,9 +292,9 @@
   <div id="leaderboard-modal" class="modal" style="display: none;">
     <div class="modal-content">
       <h2 id="lb-title">🏆 Papan Skor 🏆</h2>
-      <div id="game-summary" style="display: none; margin-bottom: 10px; background: #E1F0DA; padding: 10px; border-radius: 12px; color: #4A6B5D; font-weight: bold;"></div>
+      <div id="game-summary" style="display: none; margin-bottom: 8px; background: #E1F0DA; padding: 8px; border-radius: 10px; color: #4A6B5D; font-weight: bold; font-size: 0.85rem;"></div>
       
-      <div style="max-height: 200px; overflow-y: auto;">
+      <div style="max-height: 180px; overflow-y: auto;">
         <table class="leaderboard-table">
           <thead>
             <tr>
@@ -325,7 +308,7 @@
         </table>
       </div>
 
-      <div style="display: flex; gap: 8px; justify-content: center; margin-top: 15px;">
+      <div style="display: flex; gap: 8px; justify-content: center; margin-top: 12px;">
         <button class="btn" onclick="playAgainSamePlayer()">🔄 Main Lagi</button>
         <button class="btn btn-lilac" onclick="changePlayer()">👤 Ganti Pemain</button>
       </div>
@@ -353,7 +336,6 @@
   </footer>
 
   <script>
-    // 10 pasang item Islamic
     const items = [
       { icon: '🕌', label: 'Masjid' },
       { icon: '📖', label: 'Al-Qur\'an' },
@@ -376,48 +358,35 @@
     let canFlip = true;
     let bgmMuted = false;
 
-    // Web Audio API Synth BGM & SFX Engine
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     let bgmInterval = null;
 
     const bgmMelody = [
-      { note: 523.25, duration: 0.2 },
-      { note: 659.25, duration: 0.2 },
-      { note: 783.99, duration: 0.2 },
-      { note: 1046.50, duration: 0.3 },
-      { note: 880.00, duration: 0.2 },
-      { note: 783.99, duration: 0.2 },
-      { note: 659.25, duration: 0.3 },
-      { note: 587.33, duration: 0.2 },
-      { note: 659.25, duration: 0.2 },
-      { note: 698.46, duration: 0.2 },
+      { note: 523.25, duration: 0.2 }, { note: 659.25, duration: 0.2 },
+      { note: 783.99, duration: 0.2 }, { note: 1046.50, duration: 0.3 },
+      { note: 880.00, duration: 0.2 }, { note: 783.99, duration: 0.2 },
+      { note: 659.25, duration: 0.3 }, { note: 587.33, duration: 0.2 },
+      { note: 659.25, duration: 0.2 }, { note: 698.46, duration: 0.2 },
       { note: 783.99, duration: 0.4 },
     ];
 
     function playBGM() {
       if (bgmInterval || bgmMuted) return;
       let step = 0;
-
       bgmInterval = setInterval(() => {
         if (bgmMuted) return;
         if (audioCtx.state === 'suspended') audioCtx.resume();
-
         const currentNote = bgmMelody[step];
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-
         osc.type = 'sine';
         osc.frequency.setValueAtTime(currentNote.note, audioCtx.currentTime);
-        
         gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + currentNote.duration);
-
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-
         osc.start();
         osc.stop(audioCtx.currentTime + currentNote.duration);
-
         step = (step + 1) % bgmMelody.length;
       }, 360);
     }
@@ -432,13 +401,8 @@
     function toggleBGM() {
       bgmMuted = !bgmMuted;
       const btn = document.getElementById('bgm-btn');
-      if (bgmMuted) {
-        stopBGM();
-        btn.innerText = '🔇';
-      } else {
-        btn.innerText = '🎵';
-        playBGM();
-      }
+      if (bgmMuted) { stopBGM(); btn.innerText = '🔇'; }
+      else { btn.innerText = '🎵'; playBGM(); }
     }
 
     function playSFX(type) {
@@ -452,23 +416,20 @@
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(450, audioCtx.currentTime);
         gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.06);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.06);
       } else if (type === 'match') {
         osc.type = 'sine';
         osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
         osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08);
         osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.16);
         gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.3);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.3);
       } else if (type === 'wrong') {
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(220, audioCtx.currentTime);
         osc.frequency.setValueAtTime(180, audioCtx.currentTime + 0.1);
         gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.2);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.2);
       } else if (type === 'win') {
         const notes = [523.25, 659.25, 783.99, 1046.50];
         notes.forEach((freq, idx) => {
@@ -476,8 +437,7 @@
           const g = audioCtx.createGain();
           o.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.1);
           g.gain.setValueAtTime(0.12, audioCtx.currentTime + idx * 0.1);
-          o.connect(g);
-          g.connect(audioCtx.destination);
+          o.connect(g); o.connect(audioCtx.destination);
           o.start(audioCtx.currentTime + idx * 0.1);
           o.stop(audioCtx.currentTime + idx * 0.1 + 0.2);
         });
@@ -487,14 +447,10 @@
     function startGameWithPlayer() {
       const input = document.getElementById('player-name-input');
       const val = input.value.trim();
-      if (!val) {
-        alert('Silakan masukkan nama terlebih dahulu ya!');
-        return;
-      }
+      if (!val) { alert('Silakan masukkan nama terlebih dahulu ya!'); return; }
       playerName = val;
       document.getElementById('current-player-name').innerText = playerName;
       document.getElementById('name-modal').style.display = 'none';
-      
       playBGM();
       initGame();
     }
@@ -511,9 +467,7 @@
       initGame();
     }
 
-    function restartCurrentGame() {
-      initGame();
-    }
+    function restartCurrentGame() { initGame(); }
 
     function startTimer() {
       stopTimer();
@@ -526,10 +480,7 @@
     }
 
     function stopTimer() {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
     }
 
     function initGame() {
@@ -540,7 +491,6 @@
       moves = 0;
       canFlip = true;
       document.getElementById('moves-count').innerText = '0';
-
       startTimer();
 
       const deck = [...items, ...items]
@@ -568,7 +518,6 @@
 
     function flipCard(card) {
       if (!canFlip || card.classList.contains('flipped') || flippedCards.includes(card)) return;
-
       playSFX('flip');
       card.classList.add('flipped');
       flippedCards.push(card);
@@ -640,16 +589,10 @@
       } else {
         scores.forEach((s, i) => {
           const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td><b>${i + 1}</b></td>
-            <td>${s.name}</td>
-            <td>${s.moves}</td>
-            <td>${s.time}s</td>
-          `;
+          tr.innerHTML = `<td><b>${i + 1}</b></td><td>${s.name}</td><td>${s.moves}</td><td>${s.time}s</td>`;
           tbody.appendChild(tr);
         });
       }
-
       modal.style.display = 'flex';
     }
 
@@ -657,9 +600,7 @@
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(() => {});
       } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        }
+        if (document.exitFullscreen) { document.exitFullscreen(); }
       }
     }
 
