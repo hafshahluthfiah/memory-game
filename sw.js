@@ -1,6 +1,6 @@
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open('islamic-memory-v3').then((cache) => {
+    caches.open('islamic-memory-v4').then((cache) => {
       return cache.addAll(['./', './index.html', './manifest.json']);
     })
   );
