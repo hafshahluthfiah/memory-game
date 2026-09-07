@@ -1,9 +1,9 @@
 {
   "name": "Islamic Memory Match",
-  "short_name": "Memory Islamic",
+  "short_name": "Memory PinkBlue",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#a8e6cf",
-  "theme_color": "#4CAF50",
+  "background_color": "#FFD1DC",
+  "theme_color": "#FF80AB",
   "orientation": "portrait"
 }
