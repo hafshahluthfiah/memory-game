@@ -233,7 +233,7 @@
       width: 100%;
       height: 100%;
       text-align: center;
-      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       transform-style: preserve-3d;
       border-radius: 16px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
@@ -245,18 +245,9 @@
       transform: rotateY(180deg);
     }
 
-    /* Kartu Cocok: Tetap terbuka tapi sedikit redup/transparan */
+    /* Kartu Cocok: Tetap terbuka penuh tanpa efek transparan, tapi tidak bisa diklik */
     .card.matched {
       cursor: default;
-    }
-
-    .card.matched .card-inner {
-      opacity: 0.65;
-      box-shadow: 0 0 10px rgba(85, 239, 196, 0.4);
-    }
-
-    .card.matched .card-front {
-      border: 2px solid #55efc4; /* Frame hijau muda cerah untuk indikasi cocok */
     }
 
     .card-front, .card-back {
@@ -384,7 +375,7 @@
   </div>
 
   <script>
-    // 8 Pasang Kartu (4x4 Grid) - Kartu "Allah" diganti dengan "Kurma" 🌴
+    // 8 Pasang Kartu (4x4 Grid)
     const cardItems = [
       { name: "Masjid", icon: "🕌" },
       { name: "Ka'bah", icon: "🕋" },
@@ -543,7 +534,6 @@
       const isMatch = card1.dataset.name === card2.dataset.name;
 
       if (isMatch) {
-        // Kartu tetap terbuka dan diberi penanda matched (border hijau + pudar halus)
         card1.classList.add('matched');
         card2.classList.add('matched');
         matchedPairs++;
