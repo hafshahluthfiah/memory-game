@@ -2,150 +2,236 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Islamic Memory Match</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory Match - Islamic Edition</title>
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#E8DFF5">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#6c5ce7">
+  
+  <!-- Font Modern (Outfit) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-    
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      --card-back: linear-gradient(135deg, #6c5ce7, #a29bfe);
+      --card-front: rgba(255, 255, 255, 0.95);
+      --accent-color: #fd79a8;
+      --accent-yellow: #ffeaa7;
+      --text-color: #ffffff;
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', sans-serif;
+      user-select: none;
     }
 
     body {
-      font-family: 'Comic Sans MS', 'Chalkboard SE', 'Fredoka', sans-serif;
-      background: linear-gradient(135deg, #E8DFF5, #FCE1E4, #E1F0DA, #E8DFF5);
-      background-size: 300% 300%;
-      animation: gradientBG 18s ease infinite;
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    /* Container Utama */
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--glass-shadow);
+      position: relative;
+    }
+
+    /* Screens (Welcome, Game, Victory) */
+    .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Welcome Screen */
+    .title {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      background: linear-gradient(to right, #ffeaa7, #fd79a8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: #dcdde1;
+      margin-bottom: 24px;
+    }
+
+    .input-group {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 14px;
+      border: 2px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .input-group input::placeholder {
+      color: #b2bec3;
+    }
+
+    .input-group input:focus {
+      border-color: var(--accent-color);
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px 24px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, #fd79a8, #e84393);
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(232, 67, 147, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(232, 67, 147, 0.6);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: none;
+      margin-top: 10px;
+    }
+
+    /* Leaderboard Box */
+    .leaderboard-box {
+      width: 100%;
+      margin-top: 24px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 16px;
+      padding: 16px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .leaderboard-box h3 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      color: var(--accent-yellow);
+    }
+
+    .leaderboard-list {
+      list-style: none;
+    }
+
+    .leaderboard-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.9rem;
+    }
+
+    .leaderboard-item:last-child {
+      border-bottom: none;
+    }
+
+    /* Game Screen */
+    .game-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 12px 16px;
+      border-radius: 16px;
+    }
+
+    .stat-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      padding: 10px 16px;
     }
 
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    .stat-label {
+      font-size: 0.75rem;
+      color: #b2bec3;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
-    /* Modal Screens */
-    .modal {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(80, 70, 90, 0.35);
-      backdrop-filter: blur(6px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
+    .stat-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-yellow);
     }
 
-    .modal-content {
-      background: #FFFFFF;
-      border-radius: 24px;
-      padding: 20px 28px;
-      width: 90%;
-      max-width: 420px;
-      text-align: center;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.12);
-      border: 4px solid #D4A5A5;
-      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    @keyframes popIn {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    .modal h2 { color: #8E7AB5; font-size: 1.6rem; margin-bottom: 10px; }
-
-    .modal input {
-      width: 100%;
-      padding: 10px 14px;
-      font-size: 1rem;
-      border: 3px solid #B5C99A;
-      border-radius: 12px;
-      outline: none;
-      text-align: center;
-      margin-bottom: 14px;
-      font-weight: bold;
-      color: #4A6B5D;
-      background: #F9FBF7;
-    }
-
-    /* Header Controls */
-    header {
-      width: 100%;
-      max-width: 850px;
-      height: 42px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    .title-box {
-      background: #FFFFFF;
-      padding: 4px 16px;
-      border-radius: 18px;
-      border: 2px solid #C5A880;
-      color: #7E6352;
-      font-weight: bold;
-      font-size: 1rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
-
-    .stats-bar {
-      display: flex;
-      gap: 12px;
-      background: #FFFFFF;
-      padding: 4px 14px;
-      border-radius: 18px;
-      border: 2px solid #B5C99A;
-      font-weight: bold;
-      font-size: 0.9rem;
-      color: #4A6B5D;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
-
-    /* Grid Area Fixed Bounds (Landscape Optimized) */
-    .grid-container {
-      width: 100%;
-      max-width: 850px;
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 6px 0;
-      min-height: 0; /* Prevents overflow in flexbox */
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      grid-template-rows: repeat(4, 1fr);
-      gap: 8px;
-      width: 100%;
-      height: 100%;
-      max-height: calc(100vh - 110px); /* Kunci tinggi area kartu */
-      perspective: 1000px;
-    }
-
-    /* Card Box Auto Fit */
-    .card {
-      background-color: transparent;
+    .sound-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
       cursor: pointer;
+    }
+
+    /* Grid 4x4 Modern */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
       width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      aspect-ratio: 1 / 1;
+    }
+
+    .card {
+      background: transparent;
+      perspective: 1000px;
+      cursor: pointer;
     }
 
     .card-inner {
@@ -153,14 +239,19 @@
       width: 100%;
       height: 100%;
       text-align: center;
-      transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       transform-style: preserve-3d;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
-      border-radius: 14px;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
 
     .card.flipped .card-inner {
       transform: rotateY(180deg);
+    }
+
+    .card.matched .card-inner {
+      transform: rotateY(180deg) scale(0.95);
+      opacity: 0.7;
     }
 
     .card-front, .card-back {
@@ -169,444 +260,346 @@
       height: 100%;
       -webkit-backface-visibility: hidden;
       backface-visibility: hidden;
-      border-radius: 14px;
+      border-radius: 16px;
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
     }
 
-    /* Front Card (Lilac Pastel) */
-    .card-front {
-      background: linear-gradient(135deg, #E8DFF5, #D4A5A5);
-      border: 2px solid #FFFFFF;
-    }
-
-    .card-front::after {
-      content: '🕌';
-      font-size: min(4.5vh, 2rem);
-      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));
-    }
-
-    /* Back Card (Sage Green) */
+    /* Sisi Belakang Kartu (Ditutup) */
     .card-back {
-      background: #F4F9F4;
+      background: var(--card-back);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      font-size: 1.5rem;
+    }
+
+    .card-back::after {
+      content: '✨';
+      opacity: 0.6;
+    }
+
+    /* Sisi Depan Kartu (Dibuka) */
+    .card-front {
+      background: var(--card-front);
       transform: rotateY(180deg);
-      border: 2px solid #B5C99A;
-      padding: 2px;
+      border: 2px solid #fff;
     }
 
-    .card-back .icon {
-      font-size: min(5vh, 2.2rem);
+    .card-icon {
+      font-size: 2.2rem;
       line-height: 1;
+      margin-bottom: 4px;
     }
 
-    .card-back .label {
-      font-size: min(1.8vh, 0.75rem);
-      font-weight: bold;
-      color: #4A6B5D;
-      margin-top: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      width: 100%;
+    .card-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #2d3436;
     }
 
-    /* Footer Fixed Height */
-    footer {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      height: 40px;
-      flex-shrink: 0;
-    }
-
-    button.btn {
-      background: linear-gradient(135deg, #B5C99A, #86A789);
-      color: white;
-      border: none;
-      padding: 6px 16px;
-      font-size: 0.9rem;
-      font-weight: bold;
+    /* Modal Hasil / Victory */
+    .victory-box {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 20px;
       border-radius: 16px;
-      cursor: pointer;
-      box-shadow: 0 3px 6px rgba(134, 167, 137, 0.25);
-    }
-
-    button.btn-lilac {
-      background: linear-gradient(135deg, #8E7AB5, #B5A1E5);
-      box-shadow: 0 3px 6px rgba(142, 122, 181, 0.25);
-    }
-
-    button.btn:active { transform: translateY(2px); }
-
-    .icon-btn {
-      background: #FFFFFF;
-      border: 2px solid #8E7AB5;
-      border-radius: 50%;
-      width: 34px;
-      height: 34px;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    /* Leaderboard Table */
-    .leaderboard-table {
       width: 100%;
-      border-collapse: collapse;
-      margin: 10px 0;
-      font-size: 0.85rem;
+      margin: 16px 0;
     }
 
-    .leaderboard-table th {
-      background-color: #8E7AB5;
-      color: white;
-      padding: 6px;
+    .victory-box p {
+      margin: 8px 0;
+      font-size: 1.1rem;
     }
 
-    .leaderboard-table td {
-      padding: 6px;
-      border-bottom: 1px solid #EFEFEF;
-      color: #4A4A4A;
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 6px;
     }
-
-    .empty-lb { color: #888; font-style: italic; padding: 10px 0; }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Modal Name Input -->
-  <div id="name-modal" class="modal">
-    <div class="modal-content">
-      <h2>✨ Selamat Datang! ✨</h2>
-      <p style="color: #666; margin-bottom: 12px; font-size: 0.9rem;">Masukkan namamu untuk mulai bermain:</p>
-      <input type="text" id="player-name-input" placeholder="Nama Pemain..." maxlength="12">
-      <button class="btn btn-lilac" onclick="startGameWithPlayer()">Mulai Bermain! 🚀</button>
-    </div>
-  </div>
-
-  <!-- Modal Leaderboard / GameOver -->
-  <div id="leaderboard-modal" class="modal" style="display: none;">
-    <div class="modal-content">
-      <h2 id="lb-title">🏆 Papan Skor 🏆</h2>
-      <div id="game-summary" style="display: none; margin-bottom: 8px; background: #E1F0DA; padding: 8px; border-radius: 10px; color: #4A6B5D; font-weight: bold; font-size: 0.85rem;"></div>
+  <div class="app-container">
+    
+    <!-- Screen 1: Welcome / Input Nama -->
+    <div id="welcome-screen" class="screen active">
+      <h1 class="title">Islamic Match</h1>
+      <p class="subtitle">Asah ingatanmu dengan mencocokkan kartu 4x4!</p>
       
-      <div style="max-height: 180px; overflow-y: auto;">
-        <table class="leaderboard-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Nama</th>
-              <th>Langkah</th>
-              <th>Waktu</th>
-            </tr>
-          </thead>
-          <tbody id="lb-body"></tbody>
-        </table>
+      <div class="input-group">
+        <input type="text" id="player-name" placeholder="Masukkan Nama Kamu" maxlength="12">
       </div>
 
-      <div style="display: flex; gap: 8px; justify-content: center; margin-top: 12px;">
-        <button class="btn" onclick="playAgainSamePlayer()">🔄 Main Lagi</button>
-        <button class="btn btn-lilac" onclick="changePlayer()">👤 Ganti Pemain</button>
+      <button class="btn" onclick="startGame()">Mulai Permainan</button>
+
+      <div class="leaderboard-box">
+        <h3>🏆 Papan Skor (Tercepat)</h3>
+        <ul id="leaderboard-list" class="leaderboard-list">
+          <li class="leaderboard-item"><span>Belum ada skor</span></li>
+        </ul>
       </div>
     </div>
-  </div>
 
-  <header>
-    <div class="title-box">🕌 Memory Islamic</div>
-    <div class="stats-bar">
-      <span>👤 <span id="current-player-name">-</span></span>
-      <span>👣 <span id="moves-count">0</span></span>
-      <span>⏱️ <span id="timer-display">0s</span></span>
+    <!-- Screen 2: Game Board -->
+    <div id="game-screen" class="screen">
+      <div class="game-header">
+        <div class="stat-item">
+          <span class="stat-label">Pemain</span>
+          <span id="display-name" class="stat-value">User</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Waktu</span>
+          <span id="timer" class="stat-value">00:00</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Langkah</span>
+          <span id="moves" class="stat-value">0</span>
+        </div>
+        <button id="sound-toggle" class="sound-btn" onclick="toggleBGM()">🎵</button>
+      </div>
+
+      <!-- Grid 4x4 (16 Kartu) -->
+      <div id="grid-container" class="grid-container"></div>
     </div>
-  </header>
 
-  <div class="grid-container">
-    <div class="grid" id="grid"></div>
+    <!-- Screen 3: Victory -->
+    <div id="victory-screen" class="screen">
+      <h1 class="title">Masya Allah! 🎉</h1>
+      <p class="subtitle">Kamu berhasil menyelesaikan semua kartu!</p>
+
+      <div class="victory-box">
+        <p>Waktu: <strong id="final-time" style="color:var(--accent-yellow)">-</strong></p>
+        <p>Langkah: <strong id="final-moves" style="color:var(--accent-color)">-</strong></p>
+      </div>
+
+      <button class="btn" onclick="resetToWelcome()">Main Lagi</button>
+    </div>
+
   </div>
-
-  <footer>
-    <button class="btn btn-lilac" onclick="showLeaderboardModal()">🏆 Skor</button>
-    <button class="btn" onclick="restartCurrentGame()">🔄 Reset</button>
-    <button class="icon-btn" id="bgm-btn" onclick="toggleBGM()">🎵</button>
-    <button class="icon-btn" onclick="toggleFullScreen()">📺</button>
-  </footer>
 
   <script>
-    const items = [
-      { icon: '🕌', label: 'Masjid' },
-      { icon: '📖', label: 'Al-Qur\'an' },
-      { icon: '🌙', label: 'Bulan' },
-      { icon: '📿', label: 'Tasbih' },
-      { icon: '🕋', label: 'Ka\'bah' },
-      { icon: '🌴', label: 'Kurma' },
-      { icon: '💧', label: 'Wudhu' },
-      { icon: '✨', label: 'Sedekah' },
-      { icon: '🕌', label: 'Kubah', iconOverride: '🕌' },
-      { icon: '⭐', label: 'Bintang' }
+    // 8 Pasang Kartu (4x4 Grid)
+    const cardItems = [
+      { name: "Masjid", icon: "🕌" },
+      { name: "Ka'bah", icon: "🕋" },
+      { name: "Do'a", icon: "🤲" },
+      { name: "Bulan", icon: "🌙" },
+      { name: "Tasbih", icon: "📿" },
+      { name: "Muslimah", icon: "🧕" },
+      { name: "Allah", icon: "ﷲ" },
+      { name: "Al-Qur'an", icon: "📖" }
     ];
 
     let playerName = "";
+    let cards = [];
     let flippedCards = [];
     let matchedPairs = 0;
     let moves = 0;
-    let seconds = 0;
     let timerInterval = null;
-    let canFlip = true;
-    let bgmMuted = false;
+    let secondsElapsed = 0;
+    let bgmAudio = null;
+    let isBgmPlaying = false;
 
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let bgmInterval = null;
+    // Register Service Worker untuk PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
 
-    const bgmMelody = [
-      { note: 523.25, duration: 0.2 }, { note: 659.25, duration: 0.2 },
-      { note: 783.99, duration: 0.2 }, { note: 1046.50, duration: 0.3 },
-      { note: 880.00, duration: 0.2 }, { note: 783.99, duration: 0.2 },
-      { note: 659.25, duration: 0.3 }, { note: 587.33, duration: 0.2 },
-      { note: 659.25, duration: 0.2 }, { note: 698.46, duration: 0.2 },
-      { note: 783.99, duration: 0.4 },
-    ];
+    // Audio BGM Ceria (Menggunakan Synthesizer bawaan Web Audio API agar tanpa file eksternal)
+    let audioCtx = null;
+    let isMuted = false;
 
-    function playBGM() {
-      if (bgmInterval || bgmMuted) return;
-      let step = 0;
-      bgmInterval = setInterval(() => {
-        if (bgmMuted) return;
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const currentNote = bgmMelody[step];
+    function initBGM() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playCcheerfulNote() {
+      if (isMuted || !audioCtx) return;
+      try {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
+        const notes = [261.63, 329.63, 392.00, 523.25]; // C, E, G, C
+        const randomNote = notes[Math.floor(Math.random() * notes.length)];
+        
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(currentNote.note, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + currentNote.duration);
+        osc.frequency.setValueAtTime(randomNote, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start();
-        osc.stop(audioCtx.currentTime + currentNote.duration);
-        step = (step + 1) % bgmMelody.length;
-      }, 360);
-    }
-
-    function stopBGM() {
-      if (bgmInterval) {
-        clearInterval(bgmInterval);
-        bgmInterval = null;
-      }
+        osc.stop(audioCtx.currentTime + 0.3);
+      } catch(e){}
     }
 
     function toggleBGM() {
-      bgmMuted = !bgmMuted;
-      const btn = document.getElementById('bgm-btn');
-      if (bgmMuted) { stopBGM(); btn.innerText = '🔇'; }
-      else { btn.innerText = '🎵'; playBGM(); }
+      isMuted = !isMuted;
+      document.getElementById('sound-toggle').innerText = isMuted ? '🔇' : '🎵';
     }
 
-    function playSFX(type) {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      if (type === 'flip') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(450, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.06);
-      } else if (type === 'match') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08);
-        osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.16);
-        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-      } else if (type === 'wrong') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(220, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(180, audioCtx.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.2);
-      } else if (type === 'win') {
-        const notes = [523.25, 659.25, 783.99, 1046.50];
-        notes.forEach((freq, idx) => {
-          const o = audioCtx.createOscillator();
-          const g = audioCtx.createGain();
-          o.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.1);
-          g.gain.setValueAtTime(0.12, audioCtx.currentTime + idx * 0.1);
-          o.connect(g); o.connect(audioCtx.destination);
-          o.start(audioCtx.currentTime + idx * 0.1);
-          o.stop(audioCtx.currentTime + idx * 0.1 + 0.2);
-        });
+    // Load & Render Leaderboard
+    function updateLeaderboardUI() {
+      const leaderboard = JSON.parse(localStorage.getItem('memory_game_scores') || '[]');
+      const listEl = document.getElementById('leaderboard-list');
+      
+      if (leaderboard.length === 0) {
+        listEl.innerHTML = '<li class="leaderboard-item"><span>Belum ada skor</span></li>';
+        return;
       }
+
+      listEl.innerHTML = leaderboard.slice(0, 5).map((item, index) => `
+        <li class="leaderboard-item">
+          <span><strong>#${index + 1}</strong> ${escapeHtml(item.name)}</span>
+          <span>⏱️ ${item.timeStr} (${item.moves} m)</span>
+        </li>
+      `).join('');
     }
 
-    function startGameWithPlayer() {
-      const input = document.getElementById('player-name-input');
-      const val = input.value.trim();
-      if (!val) { alert('Silakan masukkan nama terlebih dahulu ya!'); return; }
-      playerName = val;
-      document.getElementById('current-player-name').innerText = playerName;
-      document.getElementById('name-modal').style.display = 'none';
-      playBGM();
-      initGame();
+    function saveScore(timeStr, seconds, movesCount) {
+      let leaderboard = JSON.parse(localStorage.getItem('memory_game_scores') || '[]');
+      leaderboard.push({ name: playerName, timeStr, seconds, moves: movesCount });
+      // Urutkan berdasarkan waktu terkecil, lalu langkah
+      leaderboard.sort((a, b) => a.seconds - b.seconds || a.moves - b.moves);
+      localStorage.setItem('memory_game_scores', JSON.stringify(leaderboard));
     }
 
-    function changePlayer() {
-      document.getElementById('leaderboard-modal').style.display = 'none';
-      document.getElementById('player-name-input').value = '';
-      document.getElementById('name-modal').style.display = 'flex';
-      stopTimer();
+    function escapeHtml(text) {
+      return text.replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
     }
 
-    function playAgainSamePlayer() {
-      document.getElementById('leaderboard-modal').style.display = 'none';
-      initGame();
+    // Start Game
+    function startGame() {
+      const input = document.getElementById('player-name');
+      playerName = input.value.trim() || 'Pemain';
+      document.getElementById('display-name').innerText = playerName;
+
+      initBGM();
+
+      // Switch screen
+      document.getElementById('welcome-screen').classList.remove('active');
+      document.getElementById('game-screen').classList.add('active');
+
+      setupBoard();
     }
 
-    function restartCurrentGame() { initGame(); }
+    function setupBoard() {
+      // Duplikasi 8 ikon jadi 16 kartu
+      const deck = [...cardItems, ...cardItems];
+      // Shuffle
+      deck.sort(() => Math.random() - 0.5);
 
-    function startTimer() {
-      stopTimer();
-      seconds = 0;
-      document.getElementById('timer-display').innerText = '0s';
-      timerInterval = setInterval(() => {
-        seconds++;
-        document.getElementById('timer-display').innerText = seconds + 's';
-      }, 1000);
-    }
+      const gridContainer = document.getElementById('grid-container');
+      gridContainer.innerHTML = '';
 
-    function stopTimer() {
-      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-    }
-
-    function initGame() {
-      const grid = document.getElementById('grid');
-      grid.innerHTML = '';
       flippedCards = [];
       matchedPairs = 0;
       moves = 0;
-      canFlip = true;
-      document.getElementById('moves-count').innerText = '0';
-      startTimer();
+      secondsElapsed = 0;
+      document.getElementById('moves').innerText = '0';
+      document.getElementById('timer').innerText = '00:00';
 
-      const deck = [...items, ...items]
-        .map((item, index) => ({ ...item, uniqueId: index }))
-        .sort(() => Math.random() - 0.5);
+      clearInterval(timerInterval);
+      timerInterval = setInterval(updateTimer, 1000);
 
-      deck.forEach((data) => {
+      deck.forEach((item, index) => {
         const card = document.createElement('div');
         card.classList.add('card');
-        card.dataset.label = data.label;
+        card.dataset.name = item.name;
+        card.dataset.index = index;
 
         card.innerHTML = `
           <div class="card-inner">
-            <div class="card-front"></div>
-            <div class="card-back">
-              <div class="icon">${data.iconOverride || data.icon}</div>
-              <div class="label">${data.label}</div>
+            <div class="card-back"></div>
+            <div class="card-front">
+              <span class="card-icon">${item.icon}</span>
+              <span class="card-label">${item.name}</span>
             </div>
           </div>
         `;
+
         card.addEventListener('click', () => flipCard(card));
-        grid.appendChild(card);
+        gridContainer.appendChild(card);
       });
     }
 
     function flipCard(card) {
-      if (!canFlip || card.classList.contains('flipped') || flippedCards.includes(card)) return;
-      playSFX('flip');
+      if (flippedCards.length === 2 || card.classList.contains('flipped') || card.classList.contains('matched')) {
+        return;
+      }
+
+      playCcheerfulNote();
       card.classList.add('flipped');
       flippedCards.push(card);
 
       if (flippedCards.length === 2) {
         moves++;
-        document.getElementById('moves-count').innerText = moves;
+        document.getElementById('moves').innerText = moves;
         checkMatch();
       }
     }
 
     function checkMatch() {
-      canFlip = false;
       const [card1, card2] = flippedCards;
+      const isMatch = card1.dataset.name === card2.dataset.name;
 
-      if (card1.dataset.label === card2.dataset.label) {
-        playSFX('match');
+      if (isMatch) {
+        card1.classList.add('matched');
+        card2.classList.add('matched');
         matchedPairs++;
         flippedCards = [];
-        canFlip = true;
 
-        if (matchedPairs === items.length) {
-          stopTimer();
-          playSFX('win');
-          setTimeout(() => {
-            saveScore(playerName, moves, seconds);
-            showLeaderboardModal(true);
-          }, 600);
+        if (matchedPairs === cardItems.length) {
+          endGame();
         }
       } else {
-        playSFX('wrong');
         setTimeout(() => {
           card1.classList.remove('flipped');
           card2.classList.remove('flipped');
           flippedCards = [];
-          canFlip = true;
-        }, 900);
+        }, 800);
       }
     }
 
-    function saveScore(name, moves, time) {
-      let scores = JSON.parse(localStorage.getItem('islamic_memory_scores') || '[]');
-      scores.push({ name, moves, time });
-      scores.sort((a, b) => a.moves - b.moves || a.time - b.time);
-      scores = scores.slice(0, 10);
-      localStorage.setItem('islamic_memory_scores', JSON.stringify(scores));
+    function updateTimer() {
+      secondsElapsed++;
+      const mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+      const secs = (secondsElapsed % 60).toString().padStart(2, '0');
+      document.getElementById('timer').innerText = `${mins}:${secs}`;
     }
 
-    function showLeaderboardModal(isGameOver = false) {
-      const modal = document.getElementById('leaderboard-modal');
-      const title = document.getElementById('lb-title');
-      const summary = document.getElementById('game-summary');
-      const tbody = document.getElementById('lb-body');
+    function endGame() {
+      clearInterval(timerInterval);
+      const finalTimeStr = document.getElementById('timer').innerText;
+      
+      saveScore(finalTimeStr, secondsElapsed, moves);
 
-      if (isGameOver) {
-        title.innerText = "🎉 MasyaAllah! Menang! 🎉";
-        summary.style.display = 'block';
-        summary.innerHTML = `Hebat ${playerName}!<br>Langkah: ${moves} | Waktu: ${seconds} detik`;
-      } else {
-        title.innerText = "🏆 Papan Skor 🏆";
-        summary.style.display = 'none';
-      }
+      document.getElementById('final-time').innerText = finalTimeStr;
+      document.getElementById('final-moves').innerText = moves;
 
-      const scores = JSON.parse(localStorage.getItem('islamic_memory_scores') || '[]');
-      tbody.innerHTML = '';
-
-      if (scores.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="empty-lb">Belum ada skor tersimpan. Yuk main!</td></tr>';
-      } else {
-        scores.forEach((s, i) => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `<td><b>${i + 1}</b></td><td>${s.name}</td><td>${s.moves}</td><td>${s.time}s</td>`;
-          tbody.appendChild(tr);
-        });
-      }
-      modal.style.display = 'flex';
+      setTimeout(() => {
+        document.getElementById('game-screen').classList.remove('active');
+        document.getElementById('victory-screen').classList.add('active');
+      }, 600);
     }
 
-    function toggleFullScreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {});
-      } else {
-        if (document.exitFullscreen) { document.exitFullscreen(); }
-      }
+    function resetToWelcome() {
+      updateLeaderboardUI();
+      document.getElementById('victory-screen').classList.remove('active');
+      document.getElementById('welcome-screen').classList.add('active');
     }
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
-    }
+    // Init pada load pertama
+    updateLeaderboardUI();
   </script>
 </body>
 </html>
