@@ -58,7 +58,7 @@
       position: relative;
     }
 
-    /* Screens (Welcome, Game, Victory) */
+    /* Screens */
     .screen {
       display: none;
       flex-direction: column;
@@ -142,12 +142,6 @@
       transform: translateY(1px);
     }
 
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.2);
-      box-shadow: none;
-      margin-top: 10px;
-    }
-
     /* Leaderboard Box */
     .leaderboard-box {
       width: 100%;
@@ -219,7 +213,7 @@
       cursor: pointer;
     }
 
-    /* Grid 4x4 Modern */
+    /* Grid 4x4 */
     .grid-container {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -239,19 +233,30 @@
       width: 100%;
       height: 100%;
       text-align: center;
-      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
       transform-style: preserve-3d;
       border-radius: 16px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
 
-    .card.flipped .card-inner {
+    /* Kartu Terbuka */
+    .card.flipped .card-inner,
+    .card.matched .card-inner {
       transform: rotateY(180deg);
     }
 
+    /* Kartu Cocok: Tetap terbuka tapi sedikit redup/transparan */
+    .card.matched {
+      cursor: default;
+    }
+
     .card.matched .card-inner {
-      transform: rotateY(180deg) scale(0.95);
-      opacity: 0.7;
+      opacity: 0.65;
+      box-shadow: 0 0 10px rgba(85, 239, 196, 0.4);
+    }
+
+    .card.matched .card-front {
+      border: 2px solid #55efc4; /* Frame hijau muda cerah untuk indikasi cocok */
     }
 
     .card-front, .card-back {
@@ -267,7 +272,6 @@
       align-items: center;
     }
 
-    /* Sisi Belakang Kartu (Ditutup) */
     .card-back {
       background: var(--card-back);
       border: 2px solid rgba(255, 255, 255, 0.3);
@@ -279,7 +283,6 @@
       opacity: 0.6;
     }
 
-    /* Sisi Depan Kartu (Dibuka) */
     .card-front {
       background: var(--card-front);
       transform: rotateY(180deg);
@@ -298,7 +301,7 @@
       color: #2d3436;
     }
 
-    /* Modal Hasil / Victory */
+    /* Modal Hasil */
     .victory-box {
       background: rgba(0, 0, 0, 0.3);
       padding: 20px;
@@ -312,7 +315,6 @@
       font-size: 1.1rem;
     }
 
-    /* Scrollbar Styling */
     ::-webkit-scrollbar {
       width: 6px;
     }
@@ -326,7 +328,7 @@
 
   <div class="app-container">
     
-    <!-- Screen 1: Welcome / Input Nama -->
+    <!-- Screen 1: Welcome -->
     <div id="welcome-screen" class="screen active">
       <h1 class="title">Islamic Match</h1>
       <p class="subtitle">Asah ingatanmu dengan mencocokkan kartu 4x4!</p>
@@ -338,7 +340,7 @@
       <button class="btn" onclick="startGame()">Mulai Permainan</button>
 
       <div class="leaderboard-box">
-        <h3>🏆 Papan Skor (Tercepat)</h3>
+        <h3>🏆 Leaderboard</h3>
         <ul id="leaderboard-list" class="leaderboard-list">
           <li class="leaderboard-item"><span>Belum ada skor</span></li>
         </ul>
@@ -363,7 +365,6 @@
         <button id="sound-toggle" class="sound-btn" onclick="toggleBGM()">🎵</button>
       </div>
 
-      <!-- Grid 4x4 (16 Kartu) -->
       <div id="grid-container" class="grid-container"></div>
     </div>
 
@@ -383,7 +384,7 @@
   </div>
 
   <script>
-    // 8 Pasang Kartu (4x4 Grid)
+    // 8 Pasang Kartu (4x4 Grid) - Kartu "Allah" diganti dengan "Kurma" 🌴
     const cardItems = [
       { name: "Masjid", icon: "🕌" },
       { name: "Ka'bah", icon: "🕋" },
@@ -391,26 +392,21 @@
       { name: "Bulan", icon: "🌙" },
       { name: "Tasbih", icon: "📿" },
       { name: "Muslimah", icon: "🧕" },
-      { name: "Allah", icon: "ﷲ" },
+      { name: "Kurma", icon: "🌴" },
       { name: "Al-Qur'an", icon: "📖" }
     ];
 
     let playerName = "";
-    let cards = [];
     let flippedCards = [];
     let matchedPairs = 0;
     let moves = 0;
     let timerInterval = null;
     let secondsElapsed = 0;
-    let bgmAudio = null;
-    let isBgmPlaying = false;
 
-    // Register Service Worker untuk PWA
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(() => {});
     }
 
-    // Audio BGM Ceria (Menggunakan Synthesizer bawaan Web Audio API agar tanpa file eksternal)
     let audioCtx = null;
     let isMuted = false;
 
@@ -425,7 +421,7 @@
       try {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        const notes = [261.63, 329.63, 392.00, 523.25]; // C, E, G, C
+        const notes = [261.63, 329.63, 392.00, 523.25];
         const randomNote = notes[Math.floor(Math.random() * notes.length)];
         
         osc.type = 'sine';
@@ -445,7 +441,6 @@
       document.getElementById('sound-toggle').innerText = isMuted ? '🔇' : '🎵';
     }
 
-    // Load & Render Leaderboard
     function updateLeaderboardUI() {
       const leaderboard = JSON.parse(localStorage.getItem('memory_game_scores') || '[]');
       const listEl = document.getElementById('leaderboard-list');
@@ -466,7 +461,6 @@
     function saveScore(timeStr, seconds, movesCount) {
       let leaderboard = JSON.parse(localStorage.getItem('memory_game_scores') || '[]');
       leaderboard.push({ name: playerName, timeStr, seconds, moves: movesCount });
-      // Urutkan berdasarkan waktu terkecil, lalu langkah
       leaderboard.sort((a, b) => a.seconds - b.seconds || a.moves - b.moves);
       localStorage.setItem('memory_game_scores', JSON.stringify(leaderboard));
     }
@@ -477,7 +471,6 @@
       });
     }
 
-    // Start Game
     function startGame() {
       const input = document.getElementById('player-name');
       playerName = input.value.trim() || 'Pemain';
@@ -485,7 +478,6 @@
 
       initBGM();
 
-      // Switch screen
       document.getElementById('welcome-screen').classList.remove('active');
       document.getElementById('game-screen').classList.add('active');
 
@@ -493,9 +485,7 @@
     }
 
     function setupBoard() {
-      // Duplikasi 8 ikon jadi 16 kartu
       const deck = [...cardItems, ...cardItems];
-      // Shuffle
       deck.sort(() => Math.random() - 0.5);
 
       const gridContainer = document.getElementById('grid-container');
@@ -553,6 +543,7 @@
       const isMatch = card1.dataset.name === card2.dataset.name;
 
       if (isMatch) {
+        // Kartu tetap terbuka dan diberi penanda matched (border hijau + pudar halus)
         card1.classList.add('matched');
         card2.classList.add('matched');
         matchedPairs++;
@@ -598,7 +589,6 @@
       document.getElementById('welcome-screen').classList.add('active');
     }
 
-    // Init pada load pertama
     updateLeaderboardUI();
   </script>
 </body>
