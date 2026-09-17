@@ -44,10 +44,10 @@
       overflow-x: hidden;
     }
 
-    /* Container Utama */
+    /* Container Utama - Responsif untuk Tablet/Landscape */
     .app-container {
       width: 100%;
-      max-width: 480px;
+      max-width: 480px; /* Lebar default untuk portrait/HP */
       background: var(--glass-bg);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -56,6 +56,7 @@
       padding: 24px;
       box-shadow: var(--glass-shadow);
       position: relative;
+      transition: all 0.3s ease;
     }
 
     /* Screens */
@@ -69,6 +70,7 @@
 
     .screen.active {
       display: flex;
+      width: 100%;
     }
 
     @keyframes fadeIn {
@@ -94,7 +96,8 @@
 
     .input-group {
       width: 100%;
-      margin-bottom: 20px;
+      max-width: 320px;
+      margin: 0 auto 20px auto;
     }
 
     .input-group input {
@@ -121,6 +124,7 @@
 
     .btn {
       width: 100%;
+      max-width: 320px;
       padding: 14px 24px;
       border-radius: 14px;
       border: none;
@@ -131,6 +135,7 @@
       cursor: pointer;
       box-shadow: 0 4px 15px rgba(232, 67, 147, 0.4);
       transition: all 0.2s ease;
+      margin: 0 auto;
     }
 
     .btn:hover {
@@ -149,14 +154,40 @@
       background: rgba(0, 0, 0, 0.2);
       border-radius: 16px;
       padding: 16px;
-      max-height: 200px;
+      max-height: 250px;
       overflow-y: auto;
     }
 
-    .leaderboard-box h3 {
-      font-size: 1.1rem;
+    .leaderboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 8px;
+    }
+
+    .leaderboard-header h3 {
+      font-size: 1.1rem;
       color: var(--accent-yellow);
+      margin: 0;
+    }
+
+    .btn-reset {
+      background: rgba(255, 118, 117, 0.15);
+      border: 1px solid #ff7675;
+      padding: 6px 12px;
+      border-radius: 8px;
+      color: #ff7675;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-reset:hover {
+      background: #ff7675;
+      color: white;
     }
 
     .leaderboard-list {
@@ -183,7 +214,7 @@
       align-items: center;
       margin-bottom: 16px;
       background: rgba(0, 0, 0, 0.2);
-      padding: 12px 16px;
+      padding: 12px 20px;
       border-radius: 16px;
     }
 
@@ -213,19 +244,19 @@
       cursor: pointer;
     }
 
-    /* Grid 4x4 */
+    /* Grid Container - Default (Mobile/Portrait) 4x5 */
     .grid-container {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
       width: 100%;
-      aspect-ratio: 1 / 1;
     }
 
     .card {
       background: transparent;
       perspective: 1000px;
       cursor: pointer;
+      aspect-ratio: 1 / 1; /* Selalu jaga bentuk kartu tetap persegi */
     }
 
     .card-inner {
@@ -245,7 +276,7 @@
       transform: rotateY(180deg);
     }
 
-    /* Kartu Cocok: Tetap terbuka penuh tanpa efek transparan, tapi tidak bisa diklik */
+    /* Kartu Cocok: Tetap terbuka penuh */
     .card.matched {
       cursor: default;
     }
@@ -313,6 +344,24 @@
       background: rgba(255, 255, 255, 0.2);
       border-radius: 10px;
     }
+
+    /* Responsive untuk Tablet (Landscape) */
+    @media (min-width: 700px) {
+      .app-container {
+        max-width: 800px; /* Lebarkan kontainer di layar besar */
+        padding: 32px;
+      }
+      .grid-container {
+        grid-template-columns: repeat(5, 1fr); /* Berubah otomatis jadi 5 kolom x 4 baris */
+        gap: 16px;
+      }
+      .card-icon {
+        font-size: 2.8rem;
+      }
+      .card-label {
+        font-size: 0.9rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -322,7 +371,7 @@
     <!-- Screen 1: Welcome -->
     <div id="welcome-screen" class="screen active">
       <h1 class="title">Islamic Match</h1>
-      <p class="subtitle">Asah ingatanmu dengan mencocokkan kartu 4x4!</p>
+      <p class="subtitle">Asah ingatanmu dengan mencocokkan 20 kartu!</p>
       
       <div class="input-group">
         <input type="text" id="player-name" placeholder="Masukkan Nama Kamu" maxlength="12">
@@ -331,7 +380,10 @@
       <button class="btn" onclick="startGame()">Mulai Permainan</button>
 
       <div class="leaderboard-box">
-        <h3>🏆 Papan Skor (Tercepat)</h3>
+        <div class="leaderboard-header">
+          <h3>🏆 Papan Skor</h3>
+          <button class="btn-reset" onclick="resetLeaderboard()">Reset Data</button>
+        </div>
         <ul id="leaderboard-list" class="leaderboard-list">
           <li class="leaderboard-item"><span>Belum ada skor</span></li>
         </ul>
@@ -356,6 +408,7 @@
         <button id="sound-toggle" class="sound-btn" onclick="toggleBGM()">🎵</button>
       </div>
 
+      <!-- Grid akan otomatis beradaptasi (4x5 atau 5x4) -->
       <div id="grid-container" class="grid-container"></div>
     </div>
 
@@ -375,7 +428,7 @@
   </div>
 
   <script>
-    // 8 Pasang Kartu (4x4 Grid)
+    // 10 Pasang Kartu (Total 20 Kartu)
     const cardItems = [
       { name: "Masjid", icon: "🕌" },
       { name: "Ka'bah", icon: "🕋" },
@@ -384,7 +437,9 @@
       { name: "Tasbih", icon: "📿" },
       { name: "Muslimah", icon: "🧕" },
       { name: "Kurma", icon: "🌴" },
-      { name: "Al-Qur'an", icon: "📖" }
+      { name: "Al-Qur'an", icon: "📖" },
+      { name: "Bintang", icon: "⭐" },
+      { name: "Unta", icon: "🐫" }
     ];
 
     let playerName = "";
@@ -454,6 +509,14 @@
       leaderboard.push({ name: playerName, timeStr, seconds, moves: movesCount });
       leaderboard.sort((a, b) => a.seconds - b.seconds || a.moves - b.moves);
       localStorage.setItem('memory_game_scores', JSON.stringify(leaderboard));
+    }
+    
+    // Fungsi Reset Data Lokal
+    function resetLeaderboard() {
+      if (confirm("Yakin mau hapus semua data papan skor?")) {
+        localStorage.removeItem('memory_game_scores');
+        updateLeaderboardUI();
+      }
     }
 
     function escapeHtml(text) {
