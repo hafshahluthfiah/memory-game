@@ -44,10 +44,10 @@
       overflow-x: hidden;
     }
 
-    /* Container Utama - Responsif untuk Tablet/Landscape */
+    /* Container Utama */
     .app-container {
       width: 100%;
-      max-width: 480px; /* Lebar default untuk portrait/HP */
+      max-width: 480px; 
       background: var(--glass-bg);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -244,7 +244,7 @@
       cursor: pointer;
     }
 
-    /* Grid Container - Default (Mobile/Portrait) 4x5 */
+    /* Grid Container */
     .grid-container {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -256,7 +256,7 @@
       background: transparent;
       perspective: 1000px;
       cursor: pointer;
-      aspect-ratio: 1 / 1; /* Selalu jaga bentuk kartu tetap persegi */
+      aspect-ratio: 1 / 1; 
     }
 
     .card-inner {
@@ -270,13 +270,11 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
 
-    /* Kartu Terbuka */
     .card.flipped .card-inner,
     .card.matched .card-inner {
       transform: rotateY(180deg);
     }
 
-    /* Kartu Cocok: Tetap terbuka penuh */
     .card.matched {
       cursor: default;
     }
@@ -348,11 +346,11 @@
     /* Responsive untuk Tablet (Landscape) */
     @media (min-width: 700px) {
       .app-container {
-        max-width: 800px; /* Lebarkan kontainer di layar besar */
+        max-width: 800px;
         padding: 32px;
       }
       .grid-container {
-        grid-template-columns: repeat(5, 1fr); /* Berubah otomatis jadi 5 kolom x 4 baris */
+        grid-template-columns: repeat(5, 1fr); 
         gap: 16px;
       }
       .card-icon {
@@ -368,7 +366,6 @@
 
   <div class="app-container">
     
-    <!-- Screen 1: Welcome -->
     <div id="welcome-screen" class="screen active">
       <h1 class="title">Islamic Match</h1>
       <p class="subtitle">Asah ingatanmu dengan mencocokkan 20 kartu!</p>
@@ -390,7 +387,6 @@
       </div>
     </div>
 
-    <!-- Screen 2: Game Board -->
     <div id="game-screen" class="screen">
       <div class="game-header">
         <div class="stat-item">
@@ -408,11 +404,9 @@
         <button id="sound-toggle" class="sound-btn" onclick="toggleBGM()">🎵</button>
       </div>
 
-      <!-- Grid akan otomatis beradaptasi (4x5 atau 5x4) -->
       <div id="grid-container" class="grid-container"></div>
     </div>
 
-    <!-- Screen 3: Victory -->
     <div id="victory-screen" class="screen">
       <h1 class="title">Masya Allah! 🎉</h1>
       <p class="subtitle">Kamu berhasil menyelesaikan semua kartu!</p>
@@ -428,7 +422,6 @@
   </div>
 
   <script>
-    // 10 Pasang Kartu (Total 20 Kartu)
     const cardItems = [
       { name: "Masjid", icon: "🕌" },
       { name: "Ka'bah", icon: "🕋" },
@@ -482,6 +475,34 @@
       } catch(e){}
     }
 
+    function playMatchSound() {
+      if (isMuted || !audioCtx) return;
+      try {
+        const playNote = (freq, delay) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle'; // Menghasilkan suara yang lebih jernih mirip bel
+          
+          const startTime = audioCtx.currentTime + delay;
+          osc.frequency.setValueAtTime(freq, startTime);
+          
+          gain.gain.setValueAtTime(0, startTime);
+          gain.gain.linearRampToValueAtTime(0.04, startTime + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(startTime);
+          osc.stop(startTime + 0.3);
+        };
+
+        // Memainkan 3 nada naik berturut-turut untuk efek "success"
+        playNote(523.25, 0);      // C5
+        playNote(659.25, 0.1);    // E5
+        playNote(783.99, 0.2);    // G5
+      } catch(e){}
+    }
+
     function toggleBGM() {
       isMuted = !isMuted;
       document.getElementById('sound-toggle').innerText = isMuted ? '🔇' : '🎵';
@@ -511,7 +532,6 @@
       localStorage.setItem('memory_game_scores', JSON.stringify(leaderboard));
     }
     
-    // Fungsi Reset Data Lokal
     function resetLeaderboard() {
       if (confirm("Yakin mau hapus semua data papan skor?")) {
         localStorage.removeItem('memory_game_scores');
@@ -597,6 +617,8 @@
       const isMatch = card1.dataset.name === card2.dataset.name;
 
       if (isMatch) {
+        playMatchSound(); 
+        
         card1.classList.add('matched');
         card2.classList.add('matched');
         matchedPairs++;
