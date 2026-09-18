@@ -481,7 +481,7 @@
         const playNote = (freq, delay) => {
           const osc = audioCtx.createOscillator();
           const gain = audioCtx.createGain();
-          osc.type = 'triangle'; // Menghasilkan suara yang lebih jernih mirip bel
+          osc.type = 'triangle'; 
           
           const startTime = audioCtx.currentTime + delay;
           osc.frequency.setValueAtTime(freq, startTime);
@@ -496,10 +496,40 @@
           osc.stop(startTime + 0.3);
         };
 
-        // Memainkan 3 nada naik berturut-turut untuk efek "success"
         playNote(523.25, 0);      // C5
         playNote(659.25, 0.1);    // E5
         playNote(783.99, 0.2);    // G5
+      } catch(e){}
+    }
+
+    function playVictorySound() {
+      if (isMuted || !audioCtx) return;
+      try {
+        const playNote = (freq, delay, duration) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'square'; // Suara retro 8-bit ceria
+          
+          const startTime = audioCtx.currentTime + delay;
+          osc.frequency.setValueAtTime(freq, startTime);
+          
+          gain.gain.setValueAtTime(0, startTime);
+          gain.gain.linearRampToValueAtTime(0.05, startTime + 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(startTime);
+          osc.stop(startTime + duration);
+        };
+
+        // Melodi kemenangan (Arpeggio naik)
+        playNote(392.00, 0, 0.2);       // G4
+        playNote(523.25, 0.15, 0.2);    // C5
+        playNote(659.25, 0.3, 0.2);     // E5
+        playNote(783.99, 0.45, 0.4);    // G5 
+        playNote(659.25, 0.7, 0.2);     // E5 
+        playNote(1046.50, 0.85, 0.8);   // C6 (Tadaa!)
       } catch(e){}
     }
 
@@ -655,6 +685,7 @@
       setTimeout(() => {
         document.getElementById('game-screen').classList.remove('active');
         document.getElementById('victory-screen').classList.add('active');
+        playVictorySound(); // Memanggil musik kemenangan saat layar muncul
       }, 600);
     }
 
